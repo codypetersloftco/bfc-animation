@@ -262,6 +262,14 @@ function measureAndSet() {
     group.addEventListener('mouseleave', function() { collapseTail(tailEl); });
     group.addEventListener('touchstart', function(e) {
       e.preventDefault();
+      // Collapse all others first
+      tailIds.forEach(function(otherId) {
+        if (otherId !== id) {
+          var other = document.getElementById(otherId);
+          collapseTail(other);
+          other.dataset.open = '0';
+        }
+      });
       if (tailEl.dataset.open === '1') { collapseTail(tailEl); tailEl.dataset.open = '0'; }
       else { expandTail(tailEl); tailEl.dataset.open = '1'; }
     }, { passive: false });
@@ -284,7 +292,19 @@ var TW = {
   postFadeGap: 700
 };
 
+var animTimers = [];
+function animTimeout(fn, ms) {
+  var id = setTimeout(fn, ms);
+  animTimers.push(id);
+  return id;
+}
+function clearAnimTimers() {
+  animTimers.forEach(function(id) { clearTimeout(id); });
+  animTimers = [];
+}
+
 function runAlt2() {
+  clearAnimTimers();
   var speed = 1;
   var roof = document.getElementById('logo-roof');
   var nail = document.getElementById('logo-nail');
@@ -343,7 +363,7 @@ function runAlt2() {
     initials[groupIdx].style.transform = 'translateX(-' + groupW + 'px)';
     tailEl.style.transition = 'transform ' + duration + 's ' + curve;
     tailEl.style.transform = 'translateX(-' + groupW + 'px)';
-    setTimeout(function() {
+    animTimeout(function() {
       group.style.overflow = '';
       group.style.display = 'none';
       initials[groupIdx].style.transition = 'none';
@@ -371,7 +391,7 @@ function runAlt2() {
   }
 
   // Phase 1: LOFTCO text fades out
-  setTimeout(function() {
+  animTimeout(function() {
     layerText.style.transition = 'opacity ' + TW.loftcoFade + 's ease';
     layerText.style.opacity = '0';
   }, TW.loftcoHold * speed);
@@ -379,7 +399,7 @@ function runAlt2() {
   var t = (TW.loftcoHold + TW.postFadeGap) * speed;
 
   // Phase 2: "Better" appears centered
-  setTimeout(function() {
+  animTimeout(function() {
     bfcEl.style.opacity = '1';
     bfcEl.style.transition = 'none';
     showAndExpand(0, tailB);
@@ -390,21 +410,21 @@ function runAlt2() {
 
   // Phase 3: "Better" slides out, "Faster" appears
   var p3 = t + TW.wordHold * speed;
-  setTimeout(function() { slideOutWord(0, tailB, slideDur); }, p3);
-  setTimeout(function() { showAndExpand(1, tailF); }, p3 + slideMs);
+  animTimeout(function() { slideOutWord(0, tailB, slideDur); }, p3);
+  animTimeout(function() { showAndExpand(1, tailF); }, p3 + slideMs);
 
   // Phase 4: "Faster" slides out, "Cheaper" appears
   var p4 = p3 + slideMs + TW.wordHold * speed;
-  setTimeout(function() { slideOutWord(1, tailF, slideDur); }, p4);
-  setTimeout(function() { showAndExpand(2, tailC); }, p4 + slideMs);
+  animTimeout(function() { slideOutWord(1, tailF, slideDur); }, p4);
+  animTimeout(function() { showAndExpand(2, tailC); }, p4 + slideMs);
 
   // Phase 5: "Cheaper" slides out
   var p5 = p4 + slideMs + TW.wordHold * speed;
-  setTimeout(function() { slideOutWord(2, tailC, slideDur); }, p5);
+  animTimeout(function() { slideOutWord(2, tailC, slideDur); }, p5);
 
   // Phase 5b: B, F, C stream in
   var p5b = p5 + slideMs + 100;
-  setTimeout(function() {
+  animTimeout(function() {
     bfcEl.style.justifyContent = '';
     groups.forEach(function(g) { g.style.display = ''; });
     initials[0].style.transition = 'opacity 0.3s ease';
@@ -412,13 +432,13 @@ function runAlt2() {
     initials[0].style.opacity = '1';
   }, p5b);
 
-  setTimeout(function() {
+  animTimeout(function() {
     initials[1].style.transition = 'opacity 0.3s ease';
     initials[1].style.transform = '';
     initials[1].style.opacity = '1';
   }, p5b + TW.streamDelay);
 
-  setTimeout(function() {
+  animTimeout(function() {
     initials[2].style.transition = 'opacity 0.3s ease';
     initials[2].style.transform = '';
     initials[2].style.opacity = '1';
@@ -426,7 +446,7 @@ function runAlt2() {
 
   // Phase 6: "B F C" → "BFC" with size bump
   var p6 = p5b + TW.streamDelay * 2 + TW.streamToGap;
-  setTimeout(function() {
+  animTimeout(function() {
     var curve = 'cubic-bezier(0.16, 1, 0.3, 1)';
     bfcEl.style.transition = 'gap ' + TW.finalGapDur + 's ' + curve;
     bfcEl.style.gap = '0';
@@ -442,7 +462,7 @@ function runAlt2() {
   }, p6);
 
   // Phase 7: Clean up
-  setTimeout(function() {
+  animTimeout(function() {
     groups.forEach(function(g) { g.style.overflow = ''; });
     initials.forEach(function(i) {
       i.style.transition = '';
