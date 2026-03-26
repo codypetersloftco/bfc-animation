@@ -262,8 +262,8 @@ function measureAndSet() {
     group.addEventListener('mouseleave', function() { collapseTail(tailEl); });
     group.addEventListener('touchstart', function(e) {
       e.preventDefault();
-      var isExpanded = tailEl.style.opacity === '1' && tailEl.style.maxWidth !== '0';
-      if (isExpanded) { collapseTail(tailEl); } else { expandTail(tailEl); }
+      if (tailEl.dataset.open === '1') { collapseTail(tailEl); tailEl.dataset.open = '0'; }
+      else { expandTail(tailEl); tailEl.dataset.open = '1'; }
     }, { passive: false });
   });
 }
