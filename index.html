@@ -260,6 +260,11 @@ function measureAndSet() {
     var group = tailEl.closest('.word-group');
     group.addEventListener('mouseenter', function() { expandTail(tailEl); });
     group.addEventListener('mouseleave', function() { collapseTail(tailEl); });
+    group.addEventListener('touchstart', function(e) {
+      e.preventDefault();
+      var isExpanded = tailEl.style.opacity === '1' && tailEl.style.maxWidth !== '0';
+      if (isExpanded) { collapseTail(tailEl); } else { expandTail(tailEl); }
+    }, { passive: false });
   });
 }
 
