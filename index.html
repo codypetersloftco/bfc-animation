@@ -428,7 +428,7 @@ function runAlt2() {
     initials.forEach(function(i) {
       i.style.transition = 'margin-right ' + TW.finalGapDur + 's ' + curve + ', font-size ' + TW.finalGapDur + 's ' + curve;
       i.style.marginRight = TW.finalMargin + 'em';
-      i.style.fontSize = TW.finalFontSize + 'px';
+      i.style.fontSize = 'clamp(3.05rem, 7.6vw, ' + TW.finalFontSize + 'px)';
     });
 
     layerNail.style.transformOrigin = 'center 90%';
